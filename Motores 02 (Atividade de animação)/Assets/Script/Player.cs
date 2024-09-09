@@ -5,9 +5,10 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public float speed;
+    public float JumpForce;
+    public bool isJumping;
 
     private Rigidbody2D rig;
-
     private Animator anim;
 
     // Start is called before the first frame update
@@ -21,23 +22,46 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.D))
-        {
-            rig.velocity = Vector2.right * speed;
-            anim.SetBool("EstaCorrendo", true);
-            transform.eulerAngles = new Vector2(0f, 0f);
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            rig.velocity = Vector2.left * speed;
-            anim.SetBool("EstaCorrendo", true);
-            transform.eulerAngles = new Vector2(0f, 180f);
-        }
-        else
-        {
-            anim.SetBool("EstaCorrendo", false);
-        }
-        
+        Move();
+        Jump();
+    }
 
+    void Move()
+        {
+            Vector3 movement = new Vector3(Input.GetAxis("Horizontal"), 0f, 0f);
+            transform.position += movement * Time.deltaTime * speed;
+           
+            if (Input.GetAxis("Horizontal") > 0f)
+            {
+                anim.SetBool("EstaCorrendo", true);
+                transform.eulerAngles = new Vector3(0f, 0f, 0f);
+            }
+        
+            if (Input.GetAxis("Horizontal") < 0f)
+            {
+                anim.SetBool("EstaCorrendo", true);
+                transform.eulerAngles = new Vector3(0f, 180f, 0f);
+            }
+        
+            if (Input.GetAxis("Horizontal") == 0)
+            {
+                anim.SetBool("EstaCorrendo", false);
+            }
+        }
+    
+    void Jump()
+    {
+        if(Input.GetButtonDown("Jump"))
+        {
+            if (!isJumping)
+            {
+                rig.AddForce(new Vector2(0f, JumpForce), ForceMode2D.Impulse);
+                anim.SetBool("EstaPulando", true);
+            }
+        }
+        if (Input.GetButtonUp("Jump"))
+        {
+            anim.SetBool("EstaPulando", false);
+        }
     }
 }
